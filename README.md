@@ -118,6 +118,21 @@ SELECT set_config(
 ) WHERE current_setting('search_path') !~ '(^|,)public(,|$)';
 ```
 
+### Installing the code in dedicated schema
+
+The framework can be installed in a dedicated schema, event not present in the search_path, for example `pgunit`. In that case all calls to pgunit functions should be qualified with its installation schema name:
+```sql
+create or replace function test_case_user_create_1() returns void as $$
+declare
+  id BIGINT;
+begin
+  SELECT customer.createUser(1, 100) INTO id;
+  perform pgunit.test_assertNotNull('user not created', id);
+  perform pgunit.test_assertTrue('user id range improper', id >= 10000);
+end;
+$$ language plpgsql;
+```
+
 ---
 
 # Copyright and License
