@@ -61,12 +61,6 @@ One should run `PGUnit.sql` code using either `psql` command line tool or any ot
 ## Removal
 The `PGUnitDrop.sql` has the code one can use to remove all `PGUnit` code from the database.
 
-## Troubleshooting
-Although the unit tests are run in autonoumous transactions it is possible to run into lock issues and have the select statements above hanging. In this case have a new connection on the same database and issue the statement below to stop all locking sessions:
-select * from test_terminate('my_db_name');
-
-In order to find out which test is at issue you should run the suite one test at the time. The procedure above it is not specific to PGUnit and can be used in general as well; it will terminate all locking sessions.
-
 ## Assertion procedures
 | Procedure | Description |
 | --- | --- |
@@ -106,6 +100,12 @@ $$ language plpgsql;
 The precondition above will be shared on all 'user' tests unless one with a more specific name is created.
 
 ## Troubleshooting
+
+### Lock issues
+Although the unit tests are run in autonoumous transactions it is possible to run into lock issues and have the select statements above hanging. In this case have a new connection on the same database and issue the statement below to stop all locking sessions:
+select * from test_terminate('my_db_name');
+
+In order to find out which test is at issue you should run the suite one test at the time. The procedure above it is not specific to PGUnit and can be used in general as well; it will terminate all locking sessions.
 
 ### Install the code in public schema and switching to a different schema
 

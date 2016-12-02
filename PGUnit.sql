@@ -13,7 +13,7 @@ create or replace function test_run_all() returns setof test_results as $$
 begin
   return query select * from test_run_suite(NULL);
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path from current;
 
 --
 -- Executes all test cases part of a suite and returns the test results.
@@ -101,7 +101,7 @@ begin
     end if;
   end loop;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path from current;
 
 --
 -- recreates a _ separated string from parts array
@@ -121,7 +121,7 @@ begin
   
   return name;
 end;
-$$ language plpgsql immutable;
+$$ language plpgsql set search_path from current immutable;
 
 --
 -- Returns the procedure name matching the pattern below
@@ -160,7 +160,7 @@ begin
   
   return null;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path from current;
 
 --
 -- executes a condition boolean function
@@ -175,7 +175,7 @@ begin
   end if;
   raise exception 'condition failure: %()', proc_name using errcode = 'triggered_action_exception';
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path from current;
 
 --
 -- Use: select test_terminate('db name'); to terminate all locked processes
@@ -192,26 +192,101 @@ $$ language sql;
 --
 create or replace function test_autonomous(p_statement VARCHAR) returns void as $$
 declare
-    l_error_text CHARACTER VARYING;
-    l_error_detail CHARACTER VARYING;
+    l_error_text character varying;
+    l_error_detail character varying;
 begin
-	perform dblink_connect('test_auto', 'dbname=' || current_catalog);
+	perform test_dblink_connect('test_auto', 'dbname=' || current_catalog);
         begin
-            PERFORM dblink_exec('test_auto', 'BEGIN WORK;');
-            PERFORM dblink_exec('test_auto', p_statement);
-            PERFORM dblink_exec('test_auto', 'COMMIT;');
-            PERFORM dblink_disconnect('test_auto');
+            perform test_dblink_exec('test_auto', 'BEGIN WORK;');
+            perform test_dblink_exec('test_auto', p_statement);
+            perform test_dblink_exec('test_auto', 'COMMIT;');
+            perform test_dblink_disconnect('test_auto');
         exception
             when others then
-                GET STACKED DIAGNOSTICS l_error_text = MESSAGE_TEXT,
-		    l_error_detail = PG_EXCEPTION_DETAIL;
-                PERFORM dblink_exec('test_auto', 'ROLLBACK;');
-                PERFORM dblink_disconnect('test_auto');
-                RAISE EXCEPTION '%: Error on executing: % % %', SQLSTATE, p_statement, l_error_text, l_error_detail 
-			USING ERRCODE = SQLSTATE;
+                get stacked diagnostics l_error_text = message_text,
+					l_error_detail = pg_exception_detail;
+                perform test_dblink_exec('test_auto', 'ROLLBACK;');
+                perform test_dblink_disconnect('test_auto');
+                raise exception '%: Error on executing: % % %', sqlstate, p_statement, l_error_text, l_error_detail 
+			using errcode = sqlstate;
         end;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path from current;
+
+--
+-- Calls dblink_connect taking into account the autodetected DBLINK schema
+--
+create or replace function test_dblink_connect(text, text) returns text as $$
+declare
+	dblink_schema text := test_detect_dblink_schema();
+	dblink_result text;
+begin
+	execute format('select %s.dblink_connect($1, $2)', quote_ident(dblink_schema))
+	using $1, $2
+	into dblink_result;
+
+	return dblink_result;
+end
+$$ language plpgsql set search_path from current;
+
+--
+-- Calls dblink_disconnect taking into account the autodetected DBLINK schema
+--
+create or replace function test_dblink_disconnect(text) returns text as $$
+declare
+	dblink_schema text := test_detect_dblink_schema();
+	dblink_result text;
+begin
+	execute format('select %s.dblink_disconnect($1)', quote_ident(dblink_schema))
+	using $1
+	into dblink_result;
+
+	return dblink_result;
+end
+$$ language plpgsql set search_path from current;
+
+--
+-- Calls dblink_exec taking into account the autodetected DBLINK schema
+--
+create or replace function test_dblink_exec(text, text) returns text as $$
+declare
+	dblink_schema text := test_detect_dblink_schema();
+	dblink_result text;
+begin
+	execute format('select %s.dblink_exec($1, $2)', quote_ident(dblink_schema))
+	using $1, $2
+	into dblink_result;
+
+	return dblink_result;
+end
+$$ language plpgsql set search_path from current;
+
+--
+-- Detects the schema where DBLINK extension is installed
+-- Caches the result in the pgunit.dblink_schema setting per session
+--
+create or replace function test_detect_dblink_schema() returns text as $$
+declare
+	schema_name text;
+begin
+	begin
+		select current_setting('pgunit.dblink_schema') into schema_name;
+		if schema_name is null or schema_name = '' then
+			raise exception undefined_object;
+		end if;
+	exception
+		when undefined_object then
+			select nspname
+			into schema_name
+			from pg_extension px
+				join pg_namespace pn on px.extnamespace = pn.oid
+			where extname = 'dblink'
+		    limit 1;
+		    perform set_config('pgunit.dblink_schema', schema_name, true);
+	end;
+	return schema_name;
+end;
+$$ language plpgsql set search_path from current;
 
 create or replace function test_assertTrue(message VARCHAR, condition BOOLEAN) returns void as $$
 begin
@@ -221,7 +296,7 @@ begin
     raise exception 'assertTrue failure: %', message using errcode = 'triggered_action_exception';
   end if;
 end;
-$$ language plpgsql immutable;
+$$ language plpgsql set search_path from current immutable;
 
 create or replace function test_assertTrue(condition BOOLEAN) returns void as $$
 begin
@@ -231,7 +306,7 @@ begin
     raise exception 'assertTrue failure' using errcode = 'triggered_action_exception';
   end if;
 end;
-$$ language plpgsql immutable;
+$$ language plpgsql set search_path from current immutable;
 
 create or replace function test_assertNotNull(VARCHAR, ANYELEMENT) returns void as $$
 begin
@@ -239,7 +314,7 @@ begin
     raise exception 'assertNotNull failure: %', $1 using errcode = 'triggered_action_exception';
   end if;
 end;
-$$ language plpgsql immutable;
+$$ language plpgsql set search_path from current immutable;
 
 create or replace function test_assertNull(VARCHAR, ANYELEMENT) returns void as $$
 begin
@@ -247,10 +322,10 @@ begin
     raise exception 'assertNull failure: %', $1 using errcode = 'triggered_action_exception';
   end if;
 end;
-$$ language plpgsql immutable;
+$$ language plpgsql set search_path from current immutable;
 
 create or replace function test_fail(VARCHAR) returns void as $$
 begin
   raise exception 'test failure: %', $1 using errcode = 'triggered_action_exception';
 end;
-$$ language plpgsql immutable;
+$$ language plpgsql set search_path from current immutable;
