@@ -105,6 +105,19 @@ $$ language plpgsql;
 ```
 The precondition above will be shared on all 'user' tests unless one with a more specific name is created.
 
+## Troubleshooting
+
+### Install the code in public schema and switching to a different schema
+
+You can add 'public' schema in the search path using the statement below:
+```sql
+SELECT set_config(
+    'search_path',
+    current_setting('search_path') || ',public',
+    false
+) WHERE current_setting('search_path') !~ '(^|,)public(,|$)';
+```
+
 ---
 
 # Copyright and License
