@@ -221,7 +221,7 @@ declare
 	dblink_schema text := test_detect_dblink_schema();
 	dblink_result text;
 begin
-	execute format('select %s.dblink_connect($1, $2)', quote_ident(dblink_schema))
+	execute format('select %s.dblink_connect_u($1, $2)', quote_ident(dblink_schema))
 	using $1, $2
 	into dblink_result;
 
