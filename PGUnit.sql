@@ -227,7 +227,7 @@ begin
 
 	return dblink_result;
 end
-$$ language plpgsql set search_path from current;
+$$ language plpgsql set search_path from current security definer;
 
 --
 -- Calls dblink_disconnect taking into account the autodetected DBLINK schema

@@ -56,15 +56,7 @@ The plpgsql code dependens on the dblink extension being present in the server s
 CREATE EXTENSION DBLINK;
 ```
 
-For running tests as non-superuser, make sure to grant the user execution privileges on dblink functions:
-```sql
--- grant privileges to user MyUser
-grant execute on function public.dblink_connect_u(text, text) to MyUser;
-grant execute on function public.dblink_disconnect(text) to MyUser;
-grant execute on function public.dblink_exec(text, text) to MyUser;
-```
-
-One should run `PGUnit.sql` code using either `psql` command line tool or any other tool and have it deployed in the public schema of the selected database or a dedicated schema, such as `pgunit`.
+One should run `PGUnit.sql` code using either `psql` command line tool or any other tool and have it deployed in the public schema of the selected database or a dedicated schema, such as `pgunit`. The code should be deployed as superuser, but can be used by ordinal users.
 
 ## Removal
 The `PGUnitDrop.sql` has the code one can use to remove all `PGUnit` code from the database.
