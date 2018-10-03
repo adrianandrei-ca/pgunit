@@ -1,4 +1,5 @@
-﻿create type test_results as (
+﻿
+create type test_results as (
   test_name varchar, 
   successful boolean, 
   failed boolean, 
@@ -194,8 +195,15 @@ create or replace function test_autonomous(p_statement VARCHAR) returns void as 
 declare
     l_error_text character varying;
     l_error_detail character varying;
+    l_dblink_conn_extra character varying;
 begin
-	perform test_dblink_connect('test_auto', 'dbname=' || current_catalog);
+        begin
+	    select current_setting('pgunit.dblink_conn_extra') into l_dblink_conn_extra;
+        exception
+            when undefined_object then
+                select '' into l_dblink_conn_extra;
+        end;
+	perform test_dblink_connect('test_auto', 'dbname=' || current_catalog || ' ' || l_dblink_conn_extra);
         begin
             perform test_dblink_exec('test_auto', 'BEGIN WORK;');
             perform test_dblink_exec('test_auto', p_statement);
