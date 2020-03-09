@@ -3,7 +3,7 @@ create type test_results as (
   test_name varchar, 
   successful boolean, 
   failed boolean, 
-  errorneous boolean, 
+  erroneous boolean, 
   error_message varchar,
   duration interval);
 
