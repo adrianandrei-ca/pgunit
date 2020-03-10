@@ -72,7 +72,7 @@ The `PGUnitDrop.sql` has the code you can use to remove all `PGUnit` code from t
 
 ## Examples
 
-Test case that checks if the an application user is created by a stored procedure
+Test case that checks if an application user is created by a stored procedure
 - the user id is returned if user id 1 is a parent
 - the id is larger than a thresold
 ```sql
@@ -86,7 +86,7 @@ begin
 end;
 $$ language plpgsql;
 ```
-A precondition function for this test may be one checking for user id 1 being present into the database
+A precondition function for this test may be one checking for user id 1 being present in the database
 ```sql
 create or replace function test_precondition_user() returns boolean as $$
 declare
