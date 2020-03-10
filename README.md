@@ -20,11 +20,11 @@ A unit test execution can have 3 results: successful if the condition functions 
 
 ## Tests logical grouping
 
-The tests can be grouped based on their name structure. The underscore character is used to delimit the test name into an hierarhical structure and as such be able to share the setup, tear down, or the precondtions across several unit tests. For instance the tests 'test_case_finance_audit_x' and 'test_case_finance_accounting_y' can share the setup procedure called 'test_setup_finance', the teardown procedure 'test_teardown_finance' as well as the precondition 'test_precondition_finance' function as they share a common prefix.
+The tests can be grouped based on their name structure. The underscore character is used to separate the test name into a hierarchical structure so that you can share the setup, tear down, or the preconditions across several unit tests. For instance the tests 'test_case_finance_audit_x' and 'test_case_finance_accounting_y' can share the setup procedure called 'test_setup_finance', the teardown procedure 'test_teardown_finance' as well as the precondition 'test_precondition_finance' function as they share a common prefix.
 
 If, let's say, the audit tests have a specific precondition function, you can define a new 'test_precondition_finance_audit' function and that will be shared accross all unit test procedures with prefix 'test_case_finance_audit_' and override the common 'test_precondition_finance' function.
 
-Using the built-in grouping mechanism you can re-use the supporting code accross unit tests such as the data setup and tear down. There is little if any gain if the save data setup is shared across multiple tests and they will have to be present in test-specific setup function while having the exact same content.
+Using the built-in grouping mechanism you can re-use supporting code such as the data setup and tear down across unit tests . There is little if any gain if the save data setup is shared across multiple tests and they will have to be present in test-specific setup function while having the exact same content.
 
 ## Running one or more tests
 
