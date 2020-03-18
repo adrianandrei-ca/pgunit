@@ -63,6 +63,16 @@ CREATE EXTENSION DBLINK SCHEMA pgunit;
 
 You should run the `PGUnit.sql` code using either the `psql` command line tool or a tool like PGAdmin 4's query tool and deploy it in the public schema of the selected database or a dedicated schema, such as `pgunit`. The code should be deployed as superuser, but can be used by ordinary users.
 
+A convenient way to install the PGUnit suite in a dedicated schema is to temporarily change the search path like this:
+```sql
+ALTER DATABASE gudb0601 SET search_path TO pgunit;
+```
+run `PGUnit.sql`, and then reset the search_path. There is a good tip for this on Stack Exchange:
+https://dba.stackexchange.com/questions/145280/reset-search-path-to-the-global-cluster-default
+```sql
+ALTER DATABASE my_db RESET search_path;
+```
+
 ## Removal
 The `PGUnitDrop.sql` has the code you can use to remove all `PGUnit` code from the database.
 
