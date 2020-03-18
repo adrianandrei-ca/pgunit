@@ -65,7 +65,7 @@ You should run the `PGUnit.sql` code using either the `psql` command line tool o
 
 A convenient way to install the PGUnit suite in a dedicated schema is to temporarily change the search path like this:
 ```sql
-ALTER DATABASE gudb0601 SET search_path TO pgunit;
+ALTER DATABASE my_db SET search_path TO pgunit;
 ```
 run `PGUnit.sql`, and then reset the search_path. There is a good tip for this on Stack Exchange:
 https://dba.stackexchange.com/questions/145280/reset-search-path-to-the-global-cluster-default
