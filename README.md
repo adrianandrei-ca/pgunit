@@ -53,10 +53,15 @@ create type test_results as (
 ## Setting up PGUnit
 The plpgsql code depends on the dblink extension being present in the database you run the tests on, so you need to ensure the statement below has been run before loading the test code:
 ```sql
-CREATE EXTENSION DBLINK ; --add SCHEMA myschema if you want pgunit to run in a dedicated schema such as 'myschema'
+CREATE EXTENSION DBLINK;
+```
+If you want to set up PGUnit in a dedicated schema like 'pgunit', run these two lines of SQL:
+```sql
+CREATE SCHEMA pgunit;
+CREATE EXTENSION DBLINK SCHEMA pgunit;
 ```
 
-You should run `PGUnit.sql` code using either the `psql` command line tool or any other tool and have it deployed in the public schema of the selected database or a dedicated schema, such as `pgunit`. The code should be deployed as superuser, but can be used by ordinary users.
+You should run the `PGUnit.sql` code using either the `psql` command line tool or a tool like PGAdmin 4's query tool and deploy it in the public schema of the selected database or a dedicated schema, such as `pgunit`. The code should be deployed as superuser, but can be used by ordinary users.
 
 ## Removal
 The `PGUnitDrop.sql` has the code you can use to remove all `PGUnit` code from the database.
