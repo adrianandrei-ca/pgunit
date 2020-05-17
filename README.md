@@ -147,7 +147,9 @@ begin
 end;
 $$ language plpgsql;
 ```
-
+###Dealing with 'could not establish connection' errors
+On a local Windows server, the only way I could find of removing these errors was to pass the password
+to the connection string used to establish a connection through db_link.
 ---
 
 # Copyright and License
