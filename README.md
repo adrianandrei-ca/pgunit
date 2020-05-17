@@ -150,10 +150,11 @@ $$ language plpgsql;
 ## Dealing with 'could not establish connection' errors
 
 On a local server running in Windows 10, the only way I could find of removing these errors was to pass the database
-owner's name as user to the connection string used to establish a connection through db_link. The commit entitled 'Added pgunit.dblink_conn_extra setting for extra connection settings' checks a current_setting called 'pgunit.dblink_conn_extra'. If it exists, it adds the string in that setting to the connection. So, just before running test_run_all(), you need to set a configuration setting like this:
+owner's name as user to the connection string used to establish a connection through db_link. The commit entitled 'Added pgunit.dblink_conn_extra setting for extra connection settings' checks a current_setting called 'pgunit.dblink_conn_extra'. If it exists, it adds the string in that setting to the connection. So, just before running test_run_all(), you need to set a configuration setting. In my environment, I only needed to specify the owner of the database. The password is supplied from the pgpass.conf file. I passed `false` as the 3rd parameter to add the setting to the current session. If you pass `true`, you get 'could not establish connection' errors again.
+
 ```sql
 select set_config('pgunit.dblink_conn_extra', 'user=myuser", false)
-```I passed `false` as the 3rd parameter to add the setting to the current session. If you pass `true`, you get 'could not establish connection' errors again.
+```
 ---
 
 # Copyright and License
