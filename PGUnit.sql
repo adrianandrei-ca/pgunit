@@ -3,7 +3,7 @@ create type test_results as (
   test_name varchar, 
   successful boolean, 
   failed boolean, 
-  errorneous boolean, 
+  erroneous boolean, 
   error_message varchar,
   duration interval);
 
@@ -77,18 +77,18 @@ begin
       perform test_autonomous(l_cmd);
       l_row.successful := true;
       l_row.failed := false;
-      l_row.errorneous := false;
+      l_row.erroneous := false;
       l_row.error_message := 'OK';
     exception 
       when triggered_action_exception then
         l_row.successful := false;
         l_row.failed := true;
-        l_row.errorneous := false;
+        l_row.erroneous := false;
         l_row.error_message := SQLERRM;
       when others then
         l_row.successful := false;
         l_row.failed := false;
-        l_row.errorneous := true;
+        l_row.erroneous := true;
         l_row.error_message := SQLERRM;
     end;
     l_row.duration = clock_timestamp() - l_start_ts;
