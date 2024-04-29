@@ -156,6 +156,12 @@ owner's name as user to the connection string used to establish a connection thr
 select set_config('pgunit.dblink_conn_extra', 'user=myuser", false)
 ```
 ---
+We can generalise from this by checking the PostgreSQL documentation on connection strings: https://www.postgresql.org/docs/16/libpq-connect.html#LIBPQ-CONNSTRING
+
+I got the 'could not establish connection' errors on a shared server running Ubuntu. I don't have super user privileges; I only have full privileges on my local instance of PostgreSQL running on a non-standard port. So, I need to specify
+the port in the connection string. I also couldn't find a way to get the password supplied from the pgpass.conf file so I had to add to the 'pgunit.dblink_conn_extra' setting like this:
+
+select set_config('pgunit.dblink_conn_extra', 'host=localhost port=non_standard_number password=my_password', false);
 
 # Copyright and License
 
