@@ -151,6 +151,7 @@ $$ language plpgsql;
 
 On a local server running in Windows 10, the only way I could find of removing these errors was to pass the database
 owner's name as user to the connection string used to establish a connection through db_link. The commit entitled 'Added pgunit.dblink_conn_extra setting for extra connection settings' checks a current_setting called 'pgunit.dblink_conn_extra'. If it exists, it adds the string in that setting to the connection. So, just before running test_run_all(), you need to set a configuration setting. In my environment, I only needed to specify the owner of the database. The password is supplied from the pgpass.conf file. I passed `false` as the 3rd parameter to add the setting to the current session. If you pass `true`, you get 'could not establish connection' errors again.
+UPDATE: in Windows 11, this function can't get the password from pgpass.conf.
 
 ```sql
 select set_config('pgunit.dblink_conn_extra', 'user=myuser", false)
@@ -160,8 +161,10 @@ We can generalise from this by checking the PostgreSQL documentation on connecti
 
 I got the 'could not establish connection' errors on a shared server running Ubuntu. I don't have super user privileges; I only have full privileges on my local instance of PostgreSQL running on a non-standard port. So, I need to specify
 the port in the connection string. I also couldn't find a way to get the password supplied from the pgpass.conf file so I had to add to the 'pgunit.dblink_conn_extra' setting like this:
+UPDATE: this correctly tells you to add the password but you also need to put in the user
+`select set_config('pgunit.dblink_conn_extra', 'host=localhost port=non_standard_number password=my_password', false);`
 
-select set_config('pgunit.dblink_conn_extra', 'host=localhost port=non_standard_number password=my_password', false);
+like this: `select set_config('pgunit.dblink_conn_extra', 'user=dbowner host=localhost port=non_standard_number password=my_password', false);`
 
 # Copyright and License
 
